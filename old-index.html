@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TradePilot — Demo Trading</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Arial,sans-serif;background:#0b1020;color:#eef2ff}
+header{height:64px;border-bottom:1px solid #202944;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:#0e1427;position:sticky;top:0;z-index:5}
+.logo{font-weight:800;font-size:20px}.logo span{color:#42d392}.balance{font-weight:700}.demo{color:#f7c948;font-size:12px;margin-right:12px}
+.layout{display:grid;grid-template-columns:210px 1fr 290px;min-height:calc(100vh - 64px)}
+aside{border-right:1px solid #202944;background:#0d1324;padding:18px}.nav{padding:12px;border-radius:9px;margin:5px 0;color:#aab4d0}.nav.active,.nav:hover{background:#18213a;color:#fff}
+main{padding:18px;overflow:hidden}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.card{background:#121a30;border:1px solid #222d49;border-radius:12px;padding:15px}.muted{color:#8995b4;font-size:12px}.value{font-size:20px;font-weight:750;margin-top:7px}
+.panel{background:#121a30;border:1px solid #222d49;border-radius:12px;margin-top:14px;padding:16px}.panel h3{margin:0 0 14px;font-size:15px}
+.toolbar{display:flex;gap:7px;flex-wrap:wrap}.toolbar button,.smallbtn{background:#19223a;border:1px solid #2a3758;color:#cdd6ee;padding:7px 11px;border-radius:7px;cursor:pointer}.toolbar button.active{background:#293a60;color:white}
+.chart{height:310px;position:relative;border-radius:8px;background:linear-gradient(180deg,#11192d,#0f1628);overflow:hidden}
+.grid{position:absolute;inset:0;background:linear-gradient(#ffffff0d 1px,transparent 1px),linear-gradient(90deg,#ffffff0d 1px,transparent 1px);background-size:100% 25%,12.5% 100%}
+svg{width:100%;height:100%;position:absolute}.price{position:absolute;right:8px;top:45%;background:#42d392;color:#07130d;padding:3px 6px;border-radius:4px;font-size:11px}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:10px 7px;border-bottom:1px solid #202944}th{color:#8995b4;font-size:11px}.up{color:#42d392}.down{color:#ff6b7a}
+.right{border-left:1px solid #202944;background:#0d1324;padding:18px}.watch{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #202944;cursor:pointer}.symbol{font-weight:700}.quote{font-size:13px}.tradebox input,.tradebox select{width:100%;padding:10px;margin:5px 0 10px;background:#0b1020;color:white;border:1px solid #2a3758;border-radius:7px}.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.buy,.sell{border:0;padding:11px;border-radius:8px;font-weight:800;cursor:pointer}.buy{background:#42d392;color:#06140d}.sell{background:#ff6476;color:#22060a}
+.notice{font-size:11px;color:#8995b4;line-height:1.5;margin-top:12px}
+@media(max-width:950px){.layout{grid-template-columns:70px 1fr}.right{display:none}.asideText{display:none}.cards{grid-template-columns:repeat(2,1fr)}aside{padding:10px}}
+@media(max-width:600px){header{padding:0 12px}.layout{display:block}aside{display:none}main{padding:12px}.cards{grid-template-columns:1fr 1fr}.card{padding:11px}.chart{height:250px}.balance{font-size:13px}}
+</style>
+</head>
+<body>
+<header><div class="logo">Trade<span>Pilot</span></div><div><span class="demo">DEMO ACCOUNT</span><span class="balance">Balance: $10,000.00</span></div></header>
+<div class="layout">
+<aside>
+<div class="nav active">📊 <span class="asideText">Dashboard</span></div>
+<div class="nav">📈 <span class="asideText">Markets</span></div>
+<div class="nav">💼 <span class="asideText">Portfolio</span></div>
+<div class="nav">📋 <span class="asideText">Orders</span></div>
+<div class="nav">⚙️ <span class="asideText">Settings</span></div>
+</aside>
+<main>
+<div class="cards">
+<div class="card"><div class="muted">Account Balance</div><div class="value" id="balance">$10,000.00</div></div>
+<div class="card"><div class="muted">Equity</div><div class="value" id="equity">$10,000.00</div></div>
+<div class="card"><div class="muted">Today's P/L</div><div class="value up" id="pnl">+$0.00</div></div>
+<div class="card"><div class="muted">Open Positions</div><div class="value" id="positions">0</div></div>
+</div>
+<div class="panel">
+<h3 id="pairTitle">XAU/USD — Gold</h3>
+<div class="toolbar"><button class="active" data-tf="1H">1H</button><button data-tf="4H">4H</button><button data-tf="1D">1D</button><button data-tf="1W">1W</button></div>
+<div class="chart"><div class="grid"></div><svg viewBox="0 0 1000 310" preserveAspectRatio="none"><polyline id="line" fill="none" stroke="#42d392" stroke-width="3" points="0,220 60,190 120,205 180,160 240,180 300,130 360,150 420,105 480,130 540,90 600,120 660,78 720,95 780,65 840,88 900,52 960,75 1000,45"/></svg><div class="price" id="chartPrice">$2,650.20</div></div>
+</div>
+<div class="panel"><h3>Open Positions</h3><table><thead><tr><th>Symbol</th><th>Side</th><th>Size</th><th>Entry</th><th>P/L</th></tr></thead><tbody id="positionsTable"><tr><td colspan="5" class="muted">No open positions. Use the order panel to place a demo trade.</td></tr></tbody></table></div>
+</main>
+<section class="right">
+<div class="panel" style="margin-top:0"><h3>Watchlist</h3>
+<div class="watch" data-symbol="XAU/USD"><div><div class="symbol">XAU/USD</div><div class="muted">Gold</div></div><div><div class="quote" id="qgold">2,650.20</div><div class="up">+0.42%</div></div></div>
+<div class="watch" data-symbol="EUR/USD"><div><div class="symbol">EUR/USD</div><div class="muted">Euro / USD</div></div><div><div class="quote">1.1738</div><div class="up">+0.18%</div></div></div>
+<div class="watch" data-symbol="GBP/USD"><div><div class="symbol">GBP/USD</div><div class="muted">Pound / USD</div></div><div><div class="quote">1.3451</div><div class="down">-0.12%</div></div></div>
+<div class="watch" data-symbol="BTC/USD"><div><div class="symbol">BTC/USD</div><div class="muted">Bitcoin</div></div><div><div class="quote">67,420</div><div class="up">+1.08%</div></div></div>
+</div>
+<div class="panel tradebox"><h3>Place Demo Order</h3>
+<label class="muted">Quantity</label><input id="qty" type="number" value="0.01" min="0.01" step="0.01">
+<label class="muted">Order type</label><select id="orderType"><option>Market</option><option>Limit</option></select>
+<div class="actions"><button class="buy" id="buy">BUY</button><button class="sell" id="sell">SELL</button></div>
+<div class="notice">This website is a paper-trading demo. Orders are simulated and do not connect to a broker or execute real trades.</div>
+</div>
+</section>
+</div>
+<script>
+let balance=10000, pnl=0, positions=[];
+let prices={"XAU/USD":2650.20,"EUR/USD":1.1738,"GBP/USD":1.3451,"BTC/USD":67420};
+let current="XAU/USD";
+const money=n=>"$"+n.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+function render(){
+document.getElementById("balance").textContent=money(balance);
+document.getElementById("equity").textContent=money(balance+pnl);
+document.getElementById("pnl").textContent=(pnl>=0?"+":"")+money(pnl);
+document.getElementById("positions").textContent=positions.length;
+document.getElementById("chartPrice").textContent=money(prices[current]);
+document.getElementById("qgold").textContent=prices["XAU/USD"].toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+document.getElementById("positionsTable").innerHTML=positions.length?positions.map((p,i)=>`<tr><td>${p.symbol}</td><td class="${p.side==="BUY"?"up":"down"}">${p.side}</td><td>${p.qty}</td><td>${p.entry}</td><td class="${p.side==="BUY"?"up":"down"}">${p.side==="BUY"?"+":"-"}$0.00</td></tr>`).join(""):'<tr><td colspan="5" class="muted">No open positions. Use the order panel to place a demo trade.</td></tr>';
+}
+document.querySelectorAll(".watch").forEach(w=>w.onclick=()=>{current=w.dataset.symbol;document.getElementById("pairTitle").textContent=current+" — Market";});
+document.querySelectorAll(".toolbar button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".toolbar button").forEach(x=>x.classList.remove("active"));b.classList.add("active");});
+function order(side){
+const qty=parseFloat(document.getElementById("qty").value)||0.01;
+positions.push({symbol:current,side,qty,entry:prices[current].toLocaleString()});
+render();
+}
+document.getElementById("buy").onclick=()=>order("BUY");
+document.getElementById("sell").onclick=()=>order("SELL");
+setInterval(()=>{prices["XAU/USD"]+=((Math.random()-.47)*2);render()},2500);
+render();
+</script>
+</body></html>
